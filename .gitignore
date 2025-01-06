@@ -1,7 +1,7 @@
 # Ignore build outputs
 bin/
 obj/
-obj
+
 
 # Ignore Visual Studio files
 .vs/
@@ -11,4 +11,4 @@ obj
 # Ignore other system files
 *.log
 *.tmp
-/obj/project.nuget.cache
+
