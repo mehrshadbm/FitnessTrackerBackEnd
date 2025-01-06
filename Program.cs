@@ -1,3 +1,4 @@
+using FitnessTrackerBackend.Services;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     var connectionString = builder.Configuration.GetConnectionString("MongoDBConnection");
     return new MongoClient(connectionString);
 });
+
+builder.Services.AddScoped<ActivityService>();
 
 
 var app = builder.Build();
