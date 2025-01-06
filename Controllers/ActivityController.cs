@@ -42,11 +42,9 @@ namespace FitnessTrackerBackend.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateActivity(Activity activity)
         {
-            var updatedActivity = await _activityService.UpdateActivityAsync(activity);
-            if (updatedActivity == null)
-            {
-                return NotFound("Activity not found");
-            }
+            var (success, errorMessage, updatedActivity) = await _activityService.UpdateActivityAsync(activity);
+            if (updatedActivity == null) return NotFound(new { Message = errorMessage });
+            if (!success) return BadRequest(new { Message = errorMessage });
             return Ok(updatedActivity);
         }
     }
