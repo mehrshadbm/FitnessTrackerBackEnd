@@ -7,12 +7,7 @@ namespace FitnessTrackerBackend.Controllers
     public class ActivityController : ControllerBase
     {
 
-        private readonly ILogger<ActivityController> _logger;
-
-        public ActivityController(ILogger<ActivityController> logger)
-        {
-            _logger = logger;
-        }
+        
 
     }
 }
