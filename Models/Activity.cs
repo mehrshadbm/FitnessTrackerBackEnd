@@ -1,17 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace FitnessTrackerBackend.Models
 {
     public class Activity
     {
-
-        public Guid Id {  get; set; }
+        [BsonId]
+        public string Id {  get; set; }
+        [BsonElement("activityType")]
         [Required]
         public string ActivityType { get; set; }
+        [BsonElement("duration")]
         [Required]
         public int Duration { get; set; }
+        [BsonElement("caloriesBurned")]
+        [Required]
+        public double CaloriesBurned { get; set; }
+        [BsonElement("date")]
         [Required]
         public DateTime Date { get; set; }
+        [BsonElement("intensity")]
         [Required]
         public IntensityLevel Intensity {  get; set; }
         
