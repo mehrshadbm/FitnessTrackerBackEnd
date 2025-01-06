@@ -1,5 +1,7 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace FitnessTrackerBackend.Models
 {
@@ -9,7 +11,8 @@ namespace FitnessTrackerBackend.Models
         public string Id {  get; set; }
         [BsonElement("activityType")]
         [Required]
-        public string ActivityType { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public ActivityType ActivityType { get; set; }
         [BsonElement("duration")]
         [Required]
         public int Duration { get; set; }
@@ -32,5 +35,23 @@ namespace FitnessTrackerBackend.Models
         Moderate = 2,
         Hard = 3,
         AllOut = 4
+    }
+
+    public enum ActivityType
+    {
+        [EnumMember(Value = "running")]
+        Running = 1,
+
+        [EnumMember(Value = "cycling")]
+        Cycling = 2,
+
+        [EnumMember(Value = "lifting")]
+        Lifting = 3,
+
+        [EnumMember(Value = "walking")]
+        Walking = 4,
+
+        [EnumMember(Value = "swimming")]
+        Swimming = 5
     }
 }
