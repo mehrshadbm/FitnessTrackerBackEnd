@@ -17,14 +17,20 @@ namespace FitnessTrackerBackend.Services
             return await _activities.Find(activity => true).ToListAsync();
         }
 
-        public async Task<Activity> AddActivityAsync(Activity activity)
+        public async Task<(bool Success, string ErrorMessage, Activity NewActivity)> AddActivityAsync(Activity activity)
         {
+            var isValid = ActivityValidator(activity, out var errorMessage);
+            if (!isValid)
+            {
+                return (false, errorMessage, null);
+            }
             await _activities.InsertOneAsync(activity);
-            return activity;
+            return (true, null, activity);
         }
         public async Task<Activity> RemoveActivityAsync(string id)
         {
             var activity = await _activities.Find(a => a.Id == id).FirstOrDefaultAsync();
+            if (activity == null) return null;
             await _activities.DeleteOneAsync(a => a.Id == id);
             return activity;
         }

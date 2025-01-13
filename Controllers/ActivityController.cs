@@ -25,7 +25,9 @@ namespace FitnessTrackerBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> AddActivity(Activity activity )
         {
-            var addedActivity = await _activityService.AddActivityAsync(activity);
+            var (success, errorMessage, addedActivity) = await _activityService.AddActivityAsync(activity);
+            if (addedActivity == null) return NotFound(new { Message = errorMessage });
+            if (!success) return BadRequest(new { Message = errorMessage });
             return Ok(addedActivity);
         }
 
