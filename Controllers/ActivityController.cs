@@ -63,7 +63,7 @@ namespace FitnessTrackerBackend.Controllers
             [FromQuery] IntensityLevel? maxIntensity,
             [FromQuery] string? sortBy,
             [FromQuery] string? sortOrder,
-            [FromQuery] int count = 5)
+            [FromQuery] int count = 20)
         {
             var filter = new ActivityFilter
             {
