@@ -40,18 +40,18 @@ namespace FitnessTrackerBackend.Models
     public enum ActivityType
     {
         [EnumMember(Value = "running")]
-        Running = 1,
+        running = 1,
 
         [EnumMember(Value = "cycling")]
-        Cycling = 2,
+        cycling = 2,
 
         [EnumMember(Value = "lifting")]
-        Lifting = 3,
+        lifting = 3,
 
         [EnumMember(Value = "walking")]
-        Walking = 4,
+        walking = 4,
 
         [EnumMember(Value = "swimming")]
-        Swimming = 5
+        swimming = 5
     }
 }
