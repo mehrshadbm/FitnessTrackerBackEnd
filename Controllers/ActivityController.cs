@@ -49,5 +49,40 @@ namespace FitnessTrackerBackend.Controllers
             if (!success) return BadRequest(new { Message = errorMessage });
             return Ok(updatedActivity);
         }
+
+        [HttpGet("Top")]
+        public async Task<IActionResult> GetFilteredActivities(
+            [FromQuery] ActivityType? activityType,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            [FromQuery] int? minCalories,
+            [FromQuery] int? maxCalories,
+            [FromQuery] int? minDuration,
+            [FromQuery] int? maxDuration,
+            [FromQuery] IntensityLevel? minIntensity,
+            [FromQuery] IntensityLevel? maxIntensity,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? sortOrder,
+            [FromQuery] int count = 5)
+        {
+            var filter = new ActivityFilter
+            {
+                ActivityType = activityType,
+                StartDate = startDate,
+                EndDate = endDate,
+                MinCalories = minCalories,
+                MaxCalories = maxCalories,
+                minDuration = minDuration,
+                maxDuration = maxDuration,
+                minIntensity = minIntensity ?? IntensityLevel.Easy,
+                maxIntensity = maxIntensity ?? IntensityLevel.AllOut,
+                SortBy = sortBy,
+                SortOrder = sortOrder
+            };
+
+            var topActivities = await _activityService.GetFilteredActivitiesAsync(filter, count);
+            return Ok(topActivities);
+        }
+
     }
 }

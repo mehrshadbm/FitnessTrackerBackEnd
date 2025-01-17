@@ -1,4 +1,5 @@
 ﻿using FitnessTrackerBackend.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace FitnessTrackerBackend.Services
@@ -66,7 +67,7 @@ namespace FitnessTrackerBackend.Services
                     return (false, $"An error occurred while updating the activity: {ex.Message}", null);
                 }
             }
-            
+
         }
 
 
@@ -80,6 +81,100 @@ namespace FitnessTrackerBackend.Services
             if (activity.Duration <= 0) { errorMessage = "Duration must be positive."; return false; }
             errorMessage = null;
             return true;
+        }
+
+        public async Task<List<Activity>> GetFilteredActivitiesAsync(ActivityFilter filter, int count = 5)
+        {
+            var pipeline = new List<BsonDocument>();
+
+            var matchConditions = BuildMatchStage(filter);
+            if (matchConditions != null)
+            {
+                pipeline.Add(new BsonDocument("$match", matchConditions));
+            }
+
+            string sortField = filter.SortBy ?? "caloriesBurned";
+            int sortDirection = filter.SortOrder?.ToLower() == "asc" ? 1 : -1;
+
+            pipeline.Add(new BsonDocument("$sort", new BsonDocument(sortField, sortDirection)));
+
+            pipeline.Add(new BsonDocument("$limit", count));
+
+            pipeline.Add(new BsonDocument("$project", new BsonDocument
+            {
+                { "activityType", 1 },
+                { "caloriesBurned", 1 },
+                { "duration", 1 },
+                { "date", 1 },
+                { "intensity", 1 }
+            }));
+
+            return await _activities
+                .Aggregate<Activity>(pipeline)
+                .ToListAsync();
+        }
+
+        private BsonDocument? BuildMatchStage(ActivityFilter filter)
+        {
+            var conditions = new List<BsonDocument>();
+
+            if (filter.ActivityType.HasValue)
+            {
+                conditions.Add(new BsonDocument("activityType", filter.ActivityType.ToString()));
+            }
+            if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+            {
+                conditions.Add(new BsonDocument("date", new BsonDocument
+                {
+                    { "$gte", filter.StartDate.Value },
+                    { "$lte", filter.EndDate.Value }
+                }));
+            }
+            else if (filter.StartDate.HasValue)
+            {
+                conditions.Add(new BsonDocument("date", new BsonDocument("$gte", filter.StartDate.Value)));
+            }
+            else if (filter.EndDate.HasValue)
+            {
+                conditions.Add(new BsonDocument("date", new BsonDocument("$lte", filter.EndDate.Value)));
+            }
+            if (filter.minDuration.HasValue)
+            {
+                conditions.Add(new BsonDocument("duration", new BsonDocument("$gte", filter.minDuration.Value)));
+            }
+            if (filter.maxDuration.HasValue)
+            {
+                conditions.Add(new BsonDocument("duration", new BsonDocument("$lte", filter.maxDuration.Value)));
+            }
+            if (filter.MinCalories.HasValue)
+            {
+                conditions.Add(new BsonDocument("caloriesBurned", new BsonDocument("$gte", filter.MinCalories.Value)));
+            }
+            if (filter.MaxCalories.HasValue)
+            {
+                conditions.Add(new BsonDocument("caloriesBurned", new BsonDocument("$lte", filter.MaxCalories.Value)));
+            }
+            if (filter.minIntensity != null)
+            {
+                conditions.Add(new BsonDocument("intensity", new BsonDocument("$gte", (int)filter.minIntensity)));
+            }
+            if (filter.maxIntensity != null)
+            {
+                conditions.Add(new BsonDocument("intensity", new BsonDocument("$lte", (int)filter.maxIntensity)));
+            }
+
+            if (conditions.Count == 1)
+            {
+                return conditions[0];
+            }
+            else if (conditions.Count > 1)
+            {
+                return new BsonDocument("$and", new BsonArray(conditions));
+            }
+            else
+            {
+                return null;
+            }
         }
 
     }
